@@ -3,9 +3,17 @@
 # @Time    : 2017/2/13 下午3:17
 # @Author  : Sahinn
 # @File    : cp_news.py
+# use cp_news
+# db.createCollection("news",{size:4096,max:4096})
 import re
 import urllib2
 import traceback
+import hashlib
+from pymongo import MongoClient
+
+client = MongoClient('172.16.22.251', 27017)
+db = client.cp_news
+collection = db['news']
 
 log_path = '/Users/sahinn/Documents/workspace_py/cp_news/cp_news.log'
 
@@ -38,8 +46,7 @@ def zhcw_zygg_parser():
         ul_group = re.findall(ul_reg, content, re.S | re.M)
         li_group = re.findall(li_reg, ul_group[0], re.S | re.M)
         for li_line in li_group:
-            print unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8')
-            check_save()
+            check_save(unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'))
     except :
         log_record()
 
@@ -54,8 +61,7 @@ def zhtc_zzgg_parser():
         ul_group = re.findall(ul_reg, content, re.S | re.M)
         li_group = re.findall(li_reg, ul_group[0], re.S | re.M)
         for li_line in li_group:
-            print unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), unicode(li_line[0], 'utf-8')
-            check_save()
+            check_save(unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), unicode(li_line[0], 'utf-8'))
     except :
         log_record()
 
@@ -68,14 +74,18 @@ def sdtc_tcgz_parser():
         content = url_get(url, encoding='gb2312')
         td_group = re.findall(td_reg, content, re.S | re.M)
         for li_line in td_group:
-            print unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8')
-            check_save()
+            check_save(unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'))
     except :
         log_record()
 
 
-def check_save():
-    pass
+def check_save(url, title, date):
+    md5 = hashlib.md5()
+    key = url + title + date
+    md5.update(key.encode('utf-8'))
+    md5_digest = md5.hexdigest()
+    print url, title, date
+    print md5_digest
 
 
 def send_mail():
@@ -83,7 +93,10 @@ def send_mail():
 
 
 def main():
-    sdtc_tcgz_parser()
+    print collection.find_one()
+    # zhcw_zygg_parser()
+    # zhtc_zzgg_parser()
+    # sdtc_tcgz_parser()
     send_mail()
 
 
