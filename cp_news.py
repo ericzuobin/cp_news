@@ -8,7 +8,7 @@ import urllib2
 
 
 def url_get(url, timeout=30):
-    i_headers = {"User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.1) Gecko/20090624 Firefox/3.5",
+    i_headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
                  "Referer": 'http://www.baidu.com'}
     req = urllib2.Request(url, headers=i_headers)
     result = urllib2.urlopen(req, timeout=timeout)
