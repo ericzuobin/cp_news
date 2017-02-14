@@ -29,6 +29,19 @@ def zhcw_zygg_parser():
         check_save()
 
 
+def zhtc_zzgg_parser():
+    base_url = 'http://www.lottery.gov.cn'
+    url = 'http://www.lottery.gov.cn/tzgg/index.html'
+    ul_reg = u'<div class="main_l">[\s\S]*?<\/div>'
+    li_reg = u'<li><span>\((.*?)\)<\/span><a.*?<\/a><a.*?href="(.*?)">(.*?)<\/a><\/li>'
+    content = url_get(url)
+    ul_group = re.findall(ul_reg, content, re.S | re.M)
+    li_group = re.findall(li_reg, ul_group[0], re.S | re.M)
+    for li_line in li_group:
+        print unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), unicode(li_line[0], 'utf-8')
+        check_save()
+
+
 def check_save():
     pass
 
@@ -38,7 +51,7 @@ def send_mail():
 
 
 def main():
-    zhcw_zygg_parser()
+    zhtc_zzgg_parser()
     send_mail()
 
 
