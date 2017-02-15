@@ -6,16 +6,21 @@
 # use cp_news
 # db.createCollection("news",{size:4096,max:4096})
 import re
+import urllib
 import urllib2
 import traceback
 import hashlib
+import json
+
+import pymongo
 from pymongo import MongoClient
 
+mail_url = 'http://172.16.3.145:82/LeheQ'
+log_path = '/Users/sahinn/Documents/workspace_py/cp_news/cp_news.log'
 client = MongoClient('172.16.22.251', 27017)
+mail_reciever = 'zuobin@qq.com'
 db = client.cp_news
 collection = db['news']
-
-log_path = '/Users/sahinn/Documents/workspace_py/cp_news/cp_news.log'
 
 
 def url_get(url, timeout=30, encoding="utf8"):
@@ -116,13 +121,36 @@ def news_save(news_map):
 
 
 def send_mail():
-    pass
+    db_news = collection.find({"is_warning": False}, projection={'_id': False}).sort('date', pymongo.DESCENDING)
+    content = u''
+    update_key = []
+
+    for doc in db_news:
+        update_key.append(doc['key'])
+        content += (u"<li><a href=\"%s\">(%s)%s</a></li>" % (doc['url'], doc['date'], doc['title']))
+
+    if not content:
+        content = u'今日无最新新闻'
+    html = u'''<html><head><meta http-equiv=Content-Type content=text/html; charset=utf-8></head><body>
+    <h2>彩票新闻推送</h2>
+    <ul>''' + content + u'''</ul></body></html>'''
+    import datetime
+    message = {"content": html, "encoding": "", "fromAddress": "qa@lecai.com", "fromDisplay": "", "htmlStyle": True, "mailType": "",
+     "mailto": mail_reciever, "subject": datetime.datetime.now().strftime('%Y-%m-%d') + u"彩票新闻推送"}
+    request = urllib2.Request(mail_url)
+    message = json.dumps(message)
+    data = {"q": "mailqueue", "p": "10001", "data": message, "datatype": 'json', "callback": ""}
+    urllib2.urlopen(request, urllib.urlencode(data))
+
+    if update_key:
+        collection.update_many({"key": {"$in": update_key}}, {"$set": {"is_warning": True}})
 
 
 def main():
     zhcw_zygg_parser()
     zhtc_zzgg_parser()
     sdtc_tcgz_parser()
+    send_mail()
 
 if __name__ == "__main__":
     main()
