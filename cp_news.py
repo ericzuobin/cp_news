@@ -120,9 +120,8 @@ def send_mail():
 
 
 def main():
-    # print collection.find_one()
-    # zhcw_zygg_parser()
-    # zhtc_zzgg_parser()
+    zhcw_zygg_parser()
+    zhtc_zzgg_parser()
     sdtc_tcgz_parser()
 
 if __name__ == "__main__":
