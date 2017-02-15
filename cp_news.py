@@ -21,6 +21,7 @@ client = MongoClient('172.16.22.251', 27017)
 mail_reciever = 'zuobin@qq.com'
 db = client.cp_news
 collection = db['news']
+trace = []
 
 
 def url_get(url, timeout=30, encoding="utf8"):
@@ -35,10 +36,7 @@ def url_get(url, timeout=30, encoding="utf8"):
 
 
 def log_record():
-    f = open(log_path, 'a')
-    traceback.print_exc(file=f)
-    f.flush()
-    f.close()
+    trace.append(traceback.format_exc())
 
 
 def zhcw_zygg_parser():
@@ -128,12 +126,16 @@ def send_mail():
     for doc in db_news:
         update_key.append(doc['key'])
         content += (u"<li><a href=\"%s\">(%s)%s</a></li>" % (doc['url'], doc['date'], doc['title']))
-
+    trace_m = u''
+    if trace:
+        for m in trace:
+            trace_m += m
     if not content:
         content = u'今日无最新新闻'
     html = u'''<html><head><meta http-equiv=Content-Type content=text/html; charset=utf-8></head><body>
     <h2>彩票新闻推送</h2>
-    <ul>''' + content + u'''</ul></body></html>'''
+    <ul>''' + content + u'''</ul>
+    trace : ''' + trace_m + '''</body></html>'''
     import datetime
     message = {"content": html, "encoding": "", "fromAddress": "qa@lecai.com", "fromDisplay": "", "htmlStyle": True, "mailType": "",
      "mailto": mail_reciever, "subject": datetime.datetime.now().strftime('%Y-%m-%d') + u"彩票新闻推送"}
@@ -141,7 +143,6 @@ def send_mail():
     message = json.dumps(message)
     data = {"q": "mailqueue", "p": "10001", "data": message, "datatype": 'json', "callback": ""}
     urllib2.urlopen(request, urllib.urlencode(data))
-
     if update_key:
         collection.update_many({"key": {"$in": update_key}}, {"$set": {"is_warning": True}})
 
