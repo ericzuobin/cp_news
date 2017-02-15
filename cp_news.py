@@ -45,8 +45,11 @@ def zhcw_zygg_parser():
         content = url_get(url)
         ul_group = re.findall(ul_reg, content, re.S | re.M)
         li_group = re.findall(li_reg, ul_group[0], re.S | re.M)
+        pre_map = {}
         for li_line in li_group:
-            check_save(unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'))
+            pre_save(pre_map, unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'))
+        filter_news(pre_map)
+        news_save(pre_map)
     except :
         log_record()
 
@@ -60,8 +63,11 @@ def zhtc_zzgg_parser():
         content = url_get(url)
         ul_group = re.findall(ul_reg, content, re.S | re.M)
         li_group = re.findall(li_reg, ul_group[0], re.S | re.M)
+        pre_map = {}
         for li_line in li_group:
-            check_save(unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), unicode(li_line[0], 'utf-8'))
+            pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), unicode(li_line[0], 'utf-8'))
+        filter_news(pre_map)
+        news_save(pre_map)
     except :
         log_record()
 
@@ -73,19 +79,40 @@ def sdtc_tcgz_parser():
         td_reg = u'<td.*?class="dbk".*?href="(.*?)".*?<span.*?">(.*?)<\/span>.*?<\/td>[\s\S]*?<td.*?class="dbk".*?">\[(.*?)\]<\/span><\/td>'
         content = url_get(url, encoding='gb2312')
         td_group = re.findall(td_reg, content, re.S | re.M)
+        pre_map = {}
         for li_line in td_group:
-            check_save(unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'))
+            pre_save(pre_map, unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'))
+        filter_news(pre_map)
+        news_save(pre_map)
     except :
         log_record()
 
 
-def check_save(url, title, date):
+def pre_save(pre_map, url, title, date):
     md5 = hashlib.md5()
     key = url + title + date
     md5.update(key.encode('utf-8'))
     md5_digest = md5.hexdigest()
-    print url, title, date
-    print md5_digest
+    pre_map[md5_digest] = {'key': md5_digest, 'url': url, 'title': title, 'date': date, 'is_warning': False}
+
+
+def filter_news(pre_map):
+    keys = []
+    for key in pre_map:
+        keys.append(key)
+    db_news = collection.find({"key": {"$in": keys}}, projection={'key': True, '_id': False})
+    for doc in db_news:
+        if doc['key'] in pre_map:
+            del pre_map[doc['key']]
+
+
+def news_save(news_map):
+    if not news_map:
+        return
+    docu = []
+    for key in news_map:
+        docu.append(news_map[key])
+    collection.insert_many(docu)
 
 
 def send_mail():
@@ -93,12 +120,10 @@ def send_mail():
 
 
 def main():
-    print collection.find_one()
+    # print collection.find_one()
     # zhcw_zygg_parser()
     # zhtc_zzgg_parser()
-    # sdtc_tcgz_parser()
-    send_mail()
-
+    sdtc_tcgz_parser()
 
 if __name__ == "__main__":
     main()
