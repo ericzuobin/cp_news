@@ -16,7 +16,6 @@ import pymongo
 from pymongo import MongoClient
 
 mail_url = 'http://172.16.3.145:82/LeheQ'
-log_path = '/Users/sahinn/Documents/workspace_py/cp_news/cp_news.log'
 client = MongoClient('172.16.22.251', 27017)
 mail_reciever = 'zuobin@qq.com'
 db = client.cp_news
