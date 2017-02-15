@@ -50,7 +50,7 @@ def zhcw_zygg_parser():
         li_group = re.findall(li_reg, ul_group[0], re.S | re.M)
         pre_map = {}
         for li_line in li_group:
-            pre_save(pre_map, unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'))
+            pre_save(pre_map, unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), u'中彩网')
         filter_news(pre_map)
         news_save(pre_map)
     except :
@@ -69,7 +69,7 @@ def zhtc_zzgg_parser():
         li_group = re.findall(li_reg, ul_group[0], re.S | re.M)
         pre_map = {}
         for li_line in li_group:
-            pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), unicode(li_line[0], 'utf-8'))
+            pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), unicode(li_line[0], 'utf-8'), u'中国体彩')
         filter_news(pre_map)
         news_save(pre_map)
     except :
@@ -86,7 +86,7 @@ def sdtc_tcgz_parser():
         td_group = re.findall(td_reg, content, re.S | re.M)
         pre_map = {}
         for li_line in td_group:
-            pre_save(pre_map, unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'))
+            pre_save(pre_map, unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), u'山东体彩')
         filter_news(pre_map)
         news_save(pre_map)
     except :
@@ -104,19 +104,37 @@ def gdlottery_parser():
         pre_map = {}
         for li_line in td_group:
             date = unicode(li_line[0], 'utf-8').replace(u"年", u"-").replace(u"月", u"-").replace(u"日", u"")
-            pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), date)
+            pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), date, u'广东体彩')
         filter_news(pre_map)
         news_save(pre_map)
     except :
         log_record()
 
 
-def pre_save(pre_map, url, title, date):
+# 广西体彩网
+def gxlottery_parser():
+    try:
+        base_url = 'http://www.lottery.gx.cn'
+        url = 'http://www.lottery.gx.cn/gonggao/guanfang/'
+        td_reg = u'<div class=\"dl\">.*?href="(.*?)\".*?<b>(.*?)<\/b>.*?<\/div>[\s\S]*?<span class=\"dr\">(.*?)<\/span><\/li>'
+        content = url_get(url)
+        td_group = re.findall(td_reg, content, re.S | re.M)
+        pre_map = {}
+        for li_line in td_group:
+            date = unicode(li_line[2], 'utf-8').replace(u"年", u"-").replace(u"月", u"-").replace(u"日", u"")
+            pre_save(pre_map, unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), date, u'广西体彩')
+        filter_news(pre_map)
+        news_save(pre_map)
+    except :
+        log_record()
+
+
+def pre_save(pre_map, url, title, date, regional):
     md5 = hashlib.md5()
     key = url + title + date
     md5.update(key.encode('utf-8'))
     md5_digest = md5.hexdigest()
-    pre_map[md5_digest] = {'key': md5_digest, 'url': url, 'title': title, 'date': date, 'is_warning': False}
+    pre_map[md5_digest] = {'key': md5_digest, 'url': url, 'title': title, 'date': date, 'is_warning': False, 'regional': regional}
 
 
 def filter_news(pre_map):
@@ -145,13 +163,13 @@ def send_mail():
 
     for doc in db_news:
         update_key.append(doc['key'])
-        content += (u"<li><a href=\"%s\">(%s)%s</a></li>" % (doc['url'], doc['date'], doc['title']))
+        content += (u"<li>[%s]<a href=\"%s\">%s</a>(%s)</li>" % (doc['regional'], doc['url'], doc['title'], doc['date']))
     trace_m = u''
     if trace:
         for m in trace:
             trace_m += m
     if not content:
-        content = u'今日无最新新闻'
+        content = u'所有最新新闻都已推送,请查看之前的邮件'
     html = u'''<html><head><meta http-equiv=Content-Type content=text/html; charset=utf-8></head><body>
     <h2>彩票新闻推送</h2>
     <ul>''' + content + u'''</ul>
@@ -172,6 +190,7 @@ def main():
     zhtc_zzgg_parser()
     sdtc_tcgz_parser()
     gdlottery_parser()
+    gxlottery_parser()
     send_mail()
 
 if __name__ == "__main__":
