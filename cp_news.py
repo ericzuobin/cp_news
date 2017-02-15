@@ -38,6 +38,7 @@ def log_record():
     trace.append(traceback.format_exc())
 
 
+# 中彩网
 def zhcw_zygg_parser():
     try:
         base_url = 'http://www.zhcw.com'
@@ -56,6 +57,7 @@ def zhcw_zygg_parser():
         log_record()
 
 
+# 中国体彩网
 def zhtc_zzgg_parser():
     try:
         base_url = 'http://www.lottery.gov.cn'
@@ -74,6 +76,7 @@ def zhtc_zzgg_parser():
         log_record()
 
 
+# 山东体彩网
 def sdtc_tcgz_parser():
     try:
         base_url = 'http://www.sdticai.com/'
@@ -84,6 +87,24 @@ def sdtc_tcgz_parser():
         pre_map = {}
         for li_line in td_group:
             pre_save(pre_map, unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'))
+        filter_news(pre_map)
+        news_save(pre_map)
+    except :
+        log_record()
+
+
+# 广东体彩网
+def gdlottery_parser():
+    try:
+        base_url = 'http://www.gdlottery.cn'
+        url = 'http://www.gdlottery.cn/html/gonggao/index.html'
+        td_reg = u'<span.*?class=\"r\">\((.*?)\s.*?\)<\/span>[\s\S]*?<a.*?href=\"(.*?)\".*?>(.*?)<\/a>'
+        content = url_get(url)
+        td_group = re.findall(td_reg, content, re.S | re.M)
+        pre_map = {}
+        for li_line in td_group:
+            date = unicode(li_line[0], 'utf-8').replace(u"年", u"-").replace(u"月", u"-").replace(u"日", u"")
+            pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), date)
         filter_news(pre_map)
         news_save(pre_map)
     except :
@@ -150,6 +171,7 @@ def main():
     zhcw_zygg_parser()
     zhtc_zzgg_parser()
     sdtc_tcgz_parser()
+    gdlottery_parser()
     send_mail()
 
 if __name__ == "__main__":
