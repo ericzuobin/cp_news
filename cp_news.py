@@ -57,6 +57,24 @@ def zhcw_zygg_parser():
         log_record()
 
 
+# 中福在线
+def cwl_parser():
+    try:
+        base_url = 'http://www.cwl.gov.cn'
+        url = 'http://www.cwl.gov.cn/fczx/tzgg/'
+        td_reg = u'<li>.*?class="fr">(.*?)\s.*?<\/span><a.*?href=\"..\/..(.*?)\">(.*?)<\/a><\/li>'
+        content = url_get(url)
+        td_group = re.findall(td_reg, content, re.S | re.M)
+        pre_map = {}
+        for li_line in td_group:
+            pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), unicode(li_line[0], 'utf-8'), u'广西体彩')
+        filter_news(pre_map)
+        news_save(pre_map)
+        print pre_map
+    except :
+        log_record()
+
+
 # 中国体彩网
 def zhtc_zzgg_parser():
     try:
@@ -191,6 +209,7 @@ def main():
     sdtc_tcgz_parser()
     gdlottery_parser()
     gxlottery_parser()
+    cwl_parser()
     send_mail()
 
 if __name__ == "__main__":
