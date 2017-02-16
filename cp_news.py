@@ -41,6 +41,7 @@ def log_record():
 # 中彩网
 def zhcw_zygg_parser():
     try:
+        base_name = u'中彩网'
         base_url = 'http://www.zhcw.com'
         url = 'http://www.zhcw.com/xinwen/zhongyaogonggao/'
         ul_reg = u'<ul class="Nlistul">[\s\S]*?<\/ul>'
@@ -50,8 +51,8 @@ def zhcw_zygg_parser():
         li_group = re.findall(li_reg, ul_group[0], re.S | re.M)
         pre_map = {}
         for li_line in li_group:
-            pre_save(pre_map, unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), u'中彩网')
-        filter_news(pre_map)
+            pre_save(pre_map, unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), base_name)
+        filter_news(pre_map, base_name)
         news_save(pre_map)
     except :
         log_record()
@@ -60,6 +61,7 @@ def zhcw_zygg_parser():
 # 中福在线
 def cwl_parser():
     try:
+        base_name = u'广西体彩'
         base_url = 'http://www.cwl.gov.cn'
         url = 'http://www.cwl.gov.cn/fczx/tzgg/'
         td_reg = u'<li>.*?class="fr">(.*?)\s.*?<\/span><a.*?href=\"..\/..(.*?)\">(.*?)<\/a><\/li>'
@@ -67,8 +69,8 @@ def cwl_parser():
         td_group = re.findall(td_reg, content, re.S | re.M)
         pre_map = {}
         for li_line in td_group:
-            pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), unicode(li_line[0], 'utf-8'), u'广西体彩')
-        filter_news(pre_map)
+            pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), unicode(li_line[0], 'utf-8'), base_name)
+        filter_news(pre_map, base_name)
         news_save(pre_map)
         print pre_map
     except :
@@ -78,6 +80,7 @@ def cwl_parser():
 # 中国体彩网
 def zhtc_zzgg_parser():
     try:
+        base_name = u'中国体彩'
         base_url = 'http://www.lottery.gov.cn'
         url = 'http://www.lottery.gov.cn/tzgg/index.html'
         ul_reg = u'<div class="main_l">[\s\S]*?<\/div>'
@@ -87,8 +90,8 @@ def zhtc_zzgg_parser():
         li_group = re.findall(li_reg, ul_group[0], re.S | re.M)
         pre_map = {}
         for li_line in li_group:
-            pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), unicode(li_line[0], 'utf-8'), u'中国体彩')
-        filter_news(pre_map)
+            pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), unicode(li_line[0], 'utf-8'), base_name)
+        filter_news(pre_map, base_name)
         news_save(pre_map)
     except :
         log_record()
@@ -97,6 +100,7 @@ def zhtc_zzgg_parser():
 # 山东体彩网
 def sdtc_tcgz_parser():
     try:
+        base_name = u'山东体彩'
         base_url = 'http://www.sdticai.com/'
         url = 'http://www.sdticai.com/news.asp?dlei=4'
         td_reg = u'<td.*?class="dbk".*?href="(.*?)".*?<span.*?">(.*?)<\/span>.*?<\/td>[\s\S]*?<td.*?class="dbk".*?">\[(.*?)\]<\/span><\/td>'
@@ -104,8 +108,8 @@ def sdtc_tcgz_parser():
         td_group = re.findall(td_reg, content, re.S | re.M)
         pre_map = {}
         for li_line in td_group:
-            pre_save(pre_map, unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), u'山东体彩')
-        filter_news(pre_map)
+            pre_save(pre_map, unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), base_name)
+        filter_news(pre_map, base_name)
         news_save(pre_map)
     except :
         log_record()
@@ -114,6 +118,7 @@ def sdtc_tcgz_parser():
 # 广东体彩网
 def gdlottery_parser():
     try:
+        base_name = u'广东体彩'
         base_url = 'http://www.gdlottery.cn'
         url = 'http://www.gdlottery.cn/html/gonggao/index.html'
         td_reg = u'<span.*?class=\"r\">\((.*?)\s.*?\)<\/span>[\s\S]*?<a.*?href=\"(.*?)\".*?>(.*?)<\/a>'
@@ -122,8 +127,8 @@ def gdlottery_parser():
         pre_map = {}
         for li_line in td_group:
             date = unicode(li_line[0], 'utf-8').replace(u"年", u"-").replace(u"月", u"-").replace(u"日", u"")
-            pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), date, u'广东体彩')
-        filter_news(pre_map)
+            pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), date, base_name)
+        filter_news(pre_map, base_name)
         news_save(pre_map)
     except :
         log_record()
@@ -132,6 +137,7 @@ def gdlottery_parser():
 # 广西体彩网
 def gxlottery_parser():
     try:
+        base_name = u'广西体彩'
         base_url = 'http://www.lottery.gx.cn'
         url = 'http://www.lottery.gx.cn/gonggao/guanfang/'
         td_reg = u'<div class=\"dl\">.*?href="(.*?)\".*?<b>(.*?)<\/b>.*?<\/div>[\s\S]*?<span class=\"dr\">(.*?)<\/span><\/li>'
@@ -140,8 +146,8 @@ def gxlottery_parser():
         pre_map = {}
         for li_line in td_group:
             date = unicode(li_line[2], 'utf-8').replace(u"年", u"-").replace(u"月", u"-").replace(u"日", u"")
-            pre_save(pre_map, unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), date, u'广西体彩')
-        filter_news(pre_map)
+            pre_save(pre_map, unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), date, base_name)
+        filter_news(pre_map, base_name)
         news_save(pre_map)
     except :
         log_record()
@@ -150,14 +156,15 @@ def gxlottery_parser():
 # 山东福彩网
 def sdcp_parser():
     try:
+        base_name = u'山东福彩'
         base_url = 'http://www.sdcp.cn/fbgg/'
         reg = u'<li.*?\"clearFix\">[\s\S]*?<h3.*?href=\"\.\/(.*?)\".*?_blank\">(.*?)<\/a>[\s\S]*?<span>(.*?)<\/span>[\s\S]*?<\/li>'
         content = url_get(base_url)
         group = re.findall(reg, content, re.S | re.M)
         pre_map = {}
         for line in group:
-            pre_save(pre_map, unicode(base_url + line[0], 'utf-8'), unicode(line[1], 'utf-8'), unicode(line[2], 'utf-8'), u'山东福彩')
-        filter_news(pre_map)
+            pre_save(pre_map, unicode(base_url + line[0], 'utf-8'), unicode(line[1], 'utf-8'), unicode(line[2], 'utf-8'), base_name)
+        filter_news(pre_map, base_name)
         news_save(pre_map)
     except :
         log_record()
@@ -166,6 +173,7 @@ def sdcp_parser():
 # 江西福彩网
 def jxfc_parser():
     try:
+        base_name = u'江西福彩'
         base_url = 'http://www.jxfczx.cn'
         url = 'http://www.jxfczx.cn/news/NewsListLower.aspx?TypeId=31'
         reg = u'<td.*?newslist_title_table[\s\S]*?<a.*?href=\'\.\.(.*?)\'.*?>[\s]*(.*?)<\/a>[\s\S]*?<\/td>[\s\S]*?<span.*?newslist_timeto_text.*?<\/span>.*?<span.*?>\s*(.*?)<\/span>'
@@ -173,8 +181,8 @@ def jxfc_parser():
         group = re.findall(reg, content, re.S | re.M)
         pre_map = {}
         for line in group:
-            pre_save(pre_map, unicode(base_url + line[0], 'utf-8'), unicode(line[1], 'utf-8'), unicode(line[2], 'utf-8'), u'江西福彩')
-        filter_news(pre_map)
+            pre_save(pre_map, unicode(base_url + line[0], 'utf-8'), unicode(line[1], 'utf-8'), unicode(line[2], 'utf-8'), base_name)
+        filter_news(pre_map, base_name)
         news_save(pre_map)
     except :
         log_record()
@@ -188,7 +196,10 @@ def pre_save(pre_map, url, title, date, regional):
     pre_map[md5_digest] = {'key': md5_digest, 'url': url, 'title': title, 'date': date, 'is_warning': False, 'regional': regional}
 
 
-def filter_news(pre_map):
+def filter_news(pre_map, site_name):
+    if not pre_map:
+        trace.append(site_name + u':未获取到数据,请查看脚本代码\n')
+        return
     keys = []
     for key in pre_map:
         keys.append(key)
