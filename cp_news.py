@@ -159,7 +159,23 @@ def sdcp_parser():
             pre_save(pre_map, unicode(base_url + line[0], 'utf-8'), unicode(line[1], 'utf-8'), unicode(line[2], 'utf-8'), u'山东福彩')
         filter_news(pre_map)
         news_save(pre_map)
-        print pre_map
+    except :
+        log_record()
+
+
+# 江西福彩网
+def jxfc_parser():
+    try:
+        base_url = 'http://www.jxfczx.cn'
+        url = 'http://www.jxfczx.cn/news/NewsListLower.aspx?TypeId=31'
+        reg = u'<td.*?newslist_title_table[\s\S]*?<a.*?href=\'\.\.(.*?)\'.*?>[\s]*(.*?)<\/a>[\s\S]*?<\/td>[\s\S]*?<span.*?newslist_timeto_text.*?<\/span>.*?<span.*?>\s*(.*?)<\/span>'
+        content = url_get(url)
+        group = re.findall(reg, content, re.S | re.M)
+        pre_map = {}
+        for line in group:
+            pre_save(pre_map, unicode(base_url + line[0], 'utf-8'), unicode(line[1], 'utf-8'), unicode(line[2], 'utf-8'), u'江西福彩')
+        filter_news(pre_map)
+        news_save(pre_map)
     except :
         log_record()
 
@@ -228,6 +244,7 @@ def parser():
     gxlottery_parser()
     cwl_parser()
     sdcp_parser()
+    jxfc_parser()
 
 
 def main():
