@@ -72,7 +72,6 @@ def cwl_parser():
             pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), unicode(li_line[0], 'utf-8'), base_name)
         filter_news(pre_map, base_name)
         news_save(pre_map)
-        print pre_map
     except :
         log_record()
 
