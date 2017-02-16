@@ -17,7 +17,7 @@ from pymongo import MongoClient
 
 mail_url = 'http://172.16.3.145:82/LeheQ'
 client = MongoClient('172.16.22.251', 27017)
-mail_reciever = 'zuobin@qq.com'
+mail_reciever = 'sahinn@163.com'
 db = client.cp_news
 collection = db['news']
 trace = []
@@ -147,6 +147,23 @@ def gxlottery_parser():
         log_record()
 
 
+# 山东福彩网
+def sdcp_parser():
+    try:
+        base_url = 'http://www.sdcp.cn/fbgg/'
+        reg = u'<li.*?\"clearFix\">[\s\S]*?<h3.*?href=\"\.\/(.*?)\".*?_blank\">(.*?)<\/a>[\s\S]*?<span>(.*?)<\/span>[\s\S]*?<\/li>'
+        content = url_get(base_url)
+        group = re.findall(reg, content, re.S | re.M)
+        pre_map = {}
+        for line in group:
+            pre_save(pre_map, unicode(base_url + line[0], 'utf-8'), unicode(line[1], 'utf-8'), unicode(line[2], 'utf-8'), u'山东福彩')
+        filter_news(pre_map)
+        news_save(pre_map)
+        print pre_map
+    except :
+        log_record()
+
+
 def pre_save(pre_map, url, title, date, regional):
     md5 = hashlib.md5()
     key = url + title + date
@@ -203,13 +220,18 @@ def send_mail():
         collection.update_many({"key": {"$in": update_key}}, {"$set": {"is_warning": True}})
 
 
-def main():
+def parser():
     zhcw_zygg_parser()
     zhtc_zzgg_parser()
     sdtc_tcgz_parser()
     gdlottery_parser()
     gxlottery_parser()
     cwl_parser()
+    sdcp_parser()
+
+
+def main():
+    parser()
     send_mail()
 
 if __name__ == "__main__":
