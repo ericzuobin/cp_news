@@ -61,9 +61,45 @@ def zhcw_zygg_parser():
 # 中福在线
 def cwl_parser():
     try:
-        base_name = u'广西体彩'
+        base_name = u'中福在线'
         base_url = 'http://www.cwl.gov.cn'
         url = 'http://www.cwl.gov.cn/fczx/tzgg/'
+        td_reg = u'<li>.*?class="fr">(.*?)\s.*?<\/span><a.*?href=\"..\/..(.*?)\">(.*?)<\/a><\/li>'
+        content = url_get(url)
+        td_group = re.findall(td_reg, content, re.S | re.M)
+        pre_map = {}
+        for li_line in td_group:
+            pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), unicode(li_line[0], 'utf-8'), base_name)
+        filter_news(pre_map, base_name)
+        news_save(pre_map)
+    except :
+        log_record()
+
+
+# 中福在线各省动态
+def cwl_scdt_parser():
+    try:
+        base_name = u'中福在线'
+        base_url = 'http://www.cwl.gov.cn'
+        url = 'http://www.cwl.gov.cn/fczx/scdt/'
+        td_reg = u'<li>.*?class="fr">(.*?)\s.*?<\/span><a.*?href=\"..\/..(.*?)\">(.*?)<\/a><\/li>'
+        content = url_get(url)
+        td_group = re.findall(td_reg, content, re.S | re.M)
+        pre_map = {}
+        for li_line in td_group:
+            pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), unicode(li_line[0], 'utf-8'), base_name)
+        filter_news(pre_map, base_name)
+        news_save(pre_map)
+    except :
+        log_record()
+
+
+# 中福在线福彩要闻
+def cwl_fcyw_parser():
+    try:
+        base_name = u'中福在线'
+        base_url = 'http://www.cwl.gov.cn'
+        url = 'http://www.cwl.gov.cn/fczx/fcyw/'
         td_reg = u'<li>.*?class="fr">(.*?)\s.*?<\/span><a.*?href=\"..\/..(.*?)\">(.*?)<\/a><\/li>'
         content = url_get(url)
         td_group = re.findall(td_reg, content, re.S | re.M)
@@ -253,6 +289,8 @@ def parser():
     gdlottery_parser()
     gxlottery_parser()
     cwl_parser()
+    cwl_scdt_parser()
+    cwl_fcyw_parser()
     sdcp_parser()
     jxfc_parser()
 
