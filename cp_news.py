@@ -151,11 +151,10 @@ def sdtc_tcgz_parser():
 
 
 # 广东体彩网
-def gdlottery_parser():
+def gdlottery_parser(url):
     try:
         base_name = u'广东体彩'
         base_url = 'http://www.gdlottery.cn'
-        url = 'http://www.gdlottery.cn/html/gonggao/index.html'
         td_reg = u'<span.*?class=\"r\">\((.*?)\s.*?\)<\/span>[\s\S]*?<a.*?href=\"(.*?)\".*?>(.*?)<\/a>'
         content = url_get(url)
         td_group = re.findall(td_reg, content, re.S | re.M)
@@ -286,7 +285,13 @@ def parser():
     zhcw_zygg_parser()
     zhtc_zzgg_parser()
     sdtc_tcgz_parser()
-    gdlottery_parser()
+
+    #广东体彩相关
+    gd_gg = 'http://www.gdlottery.cn/html/gonggao/index.html'
+    gd_xw = 'http://www.gdlottery.cn/html/ticaidongtai/'
+    gdlottery_parser(gd_gg)
+    gdlottery_parser(gd_xw)
+
     gxlottery_parser()
     cwl_parser()
     cwl_scdt_parser()
