@@ -16,7 +16,7 @@ import pymongo
 from pymongo import MongoClient
 
 mail_url = 'http://172.16.3.145:82/LeheQ'
-client = MongoClient('172.16.22.251', 27017)
+client = MongoClient('172.16.3.251', 27017)
 mail_reciever = 'sahinn@163.com'
 db = client.cp_news
 collection = db['news']
@@ -276,7 +276,10 @@ def send_mail():
     request = urllib2.Request(mail_url)
     message = json.dumps(message)
     data = {"q": "mailqueue", "p": "10001", "data": message, "datatype": 'json', "callback": ""}
-    urllib2.urlopen(request, urllib.urlencode(data))
+    try:
+        urllib2.urlopen(request, urllib.urlencode(data))
+    except:
+        return
     if update_key:
         collection.update_many({"key": {"$in": update_key}}, {"$set": {"is_warning": True}})
 
