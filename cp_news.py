@@ -21,6 +21,7 @@ mail_reciever = 'sahinn@163.com'
 db = client.cp_news
 collection = db['news']
 trace = []
+func_count = {}
 
 
 def url_get(url, timeout=30, encoding="utf8"):
@@ -34,8 +35,18 @@ def url_get(url, timeout=30, encoding="utf8"):
     return content
 
 
-def log_record():
-    trace.append(traceback.format_exc())
+def log_record(base_name, func):
+    if base_name in func_count:
+        func_count[base_name] += 1
+    else:
+        func_count[base_name] = 1
+    if "timeout: timed out" in traceback.format_exc():
+        trace.append(base_name + u": 请求超时</br>")
+    if func_count[base_name] <= 3:
+        func()
+    else:
+        trace.append(base_name + u": 请求失败超过3次</br>")
+        func_count[base_name] = 0
 
 
 # 中彩网
@@ -55,7 +66,7 @@ def zhcw_zygg_parser():
         filter_news(pre_map, base_name)
         news_save(pre_map)
     except :
-        log_record()
+        log_record(base_name=base_name, func=zhcw_zygg_parser)
 
 
 # 中福在线
@@ -73,7 +84,7 @@ def cwl_parser():
         filter_news(pre_map, base_name)
         news_save(pre_map)
     except :
-        log_record()
+        log_record(base_name=base_name, func=cwl_parser)
 
 
 # 中福在线各省动态
@@ -91,7 +102,7 @@ def cwl_scdt_parser():
         filter_news(pre_map, base_name)
         news_save(pre_map)
     except :
-        log_record()
+        log_record(base_name=base_name, func=cwl_scdt_parser)
 
 
 # 中福在线福彩要闻
@@ -109,7 +120,7 @@ def cwl_fcyw_parser():
         filter_news(pre_map, base_name)
         news_save(pre_map)
     except :
-        log_record()
+        log_record(base_name=base_name, func=cwl_fcyw_parser)
 
 
 # 中国体彩网
@@ -129,7 +140,7 @@ def zhtc_zzgg_parser():
         filter_news(pre_map, base_name)
         news_save(pre_map)
     except :
-        log_record()
+        log_record(base_name=base_name, func=zhtc_zzgg_parser)
 
 
 # 山东体彩网
@@ -147,11 +158,11 @@ def sdtc_tcgz_parser():
         filter_news(pre_map, base_name)
         news_save(pre_map)
     except :
-        log_record()
+        log_record(base_name=base_name, func=sdtc_tcgz_parser)
 
 
 # 广东体彩网
-def gdlottery_parser(url):
+def gdlottery(url, gd_func):
     try:
         base_name = u'广东体彩'
         base_url = 'http://www.gdlottery.cn'
@@ -165,7 +176,17 @@ def gdlottery_parser(url):
         filter_news(pre_map, base_name)
         news_save(pre_map)
     except :
-        log_record()
+        log_record(base_name=base_name, func=gd_func)
+
+
+def gdlottery_gg_parser():
+    gd_gg = 'http://www.gdlottery.cn/html/gonggao/index.html'
+    gdlottery(gd_gg, gdlottery_gg_parser)
+
+
+def gdlottery_xw_parser():
+    gd_xw = 'http://www.gdlottery.cn/html/ticaidongtai/'
+    gdlottery(gd_xw, gdlottery_xw_parser)
 
 
 # 广西体彩网
@@ -184,7 +205,7 @@ def gxlottery_parser():
         filter_news(pre_map, base_name)
         news_save(pre_map)
     except :
-        log_record()
+        log_record(base_name=base_name, func=gxlottery_parser)
 
 
 # 山东福彩网
@@ -201,7 +222,7 @@ def sdcp_parser():
         filter_news(pre_map, base_name)
         news_save(pre_map)
     except :
-        log_record()
+        log_record(base_name=base_name, func=sdcp_parser)
 
 
 # 江西福彩网
@@ -219,7 +240,7 @@ def jxfc_parser():
         filter_news(pre_map, base_name)
         news_save(pre_map)
     except :
-        log_record()
+        log_record(base_name=base_name, func=jxfc_parser)
 
 
 def pre_save(pre_map, url, title, date, regional):
@@ -288,13 +309,8 @@ def parser():
     zhcw_zygg_parser()
     zhtc_zzgg_parser()
     sdtc_tcgz_parser()
-
-    #广东体彩相关
-    gd_gg = 'http://www.gdlottery.cn/html/gonggao/index.html'
-    gd_xw = 'http://www.gdlottery.cn/html/ticaidongtai/'
-    gdlottery_parser(gd_gg)
-    gdlottery_parser(gd_xw)
-
+    gdlottery_gg_parser()
+    gdlottery_xw_parser()
     gxlottery_parser()
     cwl_parser()
     cwl_scdt_parser()
