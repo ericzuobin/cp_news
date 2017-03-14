@@ -39,12 +39,11 @@ def log_record(base_name, func):
         func_count[base_name] += 1
     else:
         func_count[base_name] = 1
-    if "timeout: timed out" in traceback.format_exc():
-        trace.append(base_name + u": 请求超时</br>")
     if func_count[base_name] <= 3:
         func()
     else:
         trace.append(base_name + u": 请求失败超过3次</br>")
+        trace.append(traceback.format_exc())
         func_count[base_name] = 0
 
 
@@ -59,6 +58,8 @@ def zhcw_zygg_parser():
         content = url_get(url)
         ul_group = re.findall(ul_reg, content, re.S | re.M)
         li_group = re.findall(li_reg, ul_group[0], re.S | re.M)
+        if not li_group:
+            trace.append(url + ":不匹配")
         pre_map = {}
         for li_line in li_group:
             pre_save(pre_map, unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), base_name)
@@ -78,6 +79,8 @@ def cwl_parser():
         content = url_get(url)
         td_group = re.findall(td_reg, content, re.S | re.M)
         pre_map = {}
+        if not td_group:
+            trace.append(url + ":不匹配")
         for li_line in td_group:
             pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), unicode(li_line[0], 'utf-8'), base_name)
         filter_news(pre_map, base_name)
@@ -95,6 +98,8 @@ def cwl_scdt_parser():
         td_reg = u'<li>.*?class="fr">(.*?)\s.*?<\/span><a.*?href=\"..\/..(.*?)\">(.*?)<\/a><\/li>'
         content = url_get(url)
         td_group = re.findall(td_reg, content, re.S | re.M)
+        if not td_group:
+            trace.append(url + ":不匹配")
         pre_map = {}
         for li_line in td_group:
             pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), unicode(li_line[0], 'utf-8'), base_name)
@@ -113,6 +118,8 @@ def cwl_fcyw_parser():
         td_reg = u'<li>.*?class="fr">(.*?)\s.*?<\/span><a.*?href=\"..\/..(.*?)\">(.*?)<\/a><\/li>'
         content = url_get(url)
         td_group = re.findall(td_reg, content, re.S | re.M)
+        if not td_group:
+            trace.append(url + ":不匹配")
         pre_map = {}
         for li_line in td_group:
             pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), unicode(li_line[0], 'utf-8'), base_name)
@@ -133,6 +140,8 @@ def zhtc_zzgg_parser():
         content = url_get(url)
         ul_group = re.findall(ul_reg, content, re.S | re.M)
         li_group = re.findall(li_reg, ul_group[0], re.S | re.M)
+        if not li_group:
+            trace.append(url + ":不匹配")
         pre_map = {}
         for li_line in li_group:
             pre_save(pre_map, unicode(base_url + li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), unicode(li_line[0], 'utf-8'), base_name)
@@ -151,6 +160,8 @@ def sdtc_tcgz_parser():
         td_reg = u'<td.*?class="dbk".*?href="(.*?)".*?<span.*?">(.*?)<\/span>.*?<\/td>[\s\S]*?<td.*?class="dbk".*?">\[(.*?)\]<\/span><\/td>'
         content = url_get(url, encoding='gb2312')
         td_group = re.findall(td_reg, content, re.S | re.M)
+        if not td_group:
+            trace.append(url + ":不匹配")
         pre_map = {}
         for li_line in td_group:
             pre_save(pre_map, unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), base_name)
@@ -168,6 +179,8 @@ def gdlottery(url, gd_func):
         td_reg = u'<span.*?class=\"r\">\((.*?)\s.*?\)<\/span>[\s\S]*?<a.*?href=\"(.*?)\".*?>(.*?)<\/a>'
         content = url_get(url)
         td_group = re.findall(td_reg, content, re.S | re.M)
+        if not td_group:
+            trace.append(url + ":不匹配")
         pre_map = {}
         for li_line in td_group:
             date = unicode(li_line[0], 'utf-8').replace(u"年", u"-").replace(u"月", u"-").replace(u"日", u"")
@@ -197,6 +210,8 @@ def gxlottery_parser():
         td_reg = u'<div class=\"dl\">.*?href="(.*?)\".*?<b>(.*?)<\/b>.*?<\/div>[\s\S]*?<span class=\"dr\">(.*?)<\/span><\/li>'
         content = url_get(url)
         td_group = re.findall(td_reg, content, re.S | re.M)
+        if not td_group:
+            trace.append(url + ":不匹配")
         pre_map = {}
         for li_line in td_group:
             date = unicode(li_line[2], 'utf-8').replace(u"年", u"-").replace(u"月", u"-").replace(u"日", u"")
@@ -215,6 +230,8 @@ def sdcp_parser():
         reg = u'<li.*?\"clearFix\">[\s\S]*?<h3.*?href=\"\.\/(.*?)\".*?_blank\">(.*?)<\/a>[\s\S]*?<span>(.*?)<\/span>[\s\S]*?<\/li>'
         content = url_get(base_url)
         group = re.findall(reg, content, re.S | re.M)
+        if not group:
+            trace.append(base_url + ":不匹配")
         pre_map = {}
         for line in group:
             pre_save(pre_map, unicode(base_url + line[0], 'utf-8'), unicode(line[1], 'utf-8'), unicode(line[2], 'utf-8'), base_name)
@@ -233,6 +250,8 @@ def jxfc_parser():
         reg = u'<td.*?newslist_title_table[\s\S]*?<a.*?href=\'\.\.(.*?)\'.*?>[\s]*(.*?)<\/a>[\s\S]*?<\/td>[\s\S]*?<span.*?newslist_timeto_text.*?<\/span>.*?<span.*?>\s*(.*?)<\/span>'
         content = url_get(url)
         group = re.findall(reg, content, re.S | re.M)
+        if not group:
+            trace.append(url + ":不匹配")
         pre_map = {}
         for line in group:
             pre_save(pre_map, unicode(base_url + line[0], 'utf-8'), unicode(line[1], 'utf-8'), unicode(line[2], 'utf-8'), base_name)
@@ -276,7 +295,8 @@ def send_mail():
     db_news = collection.find({"is_warning": False}, projection={'_id': False}).sort('date', pymongo.DESCENDING)
     content = u''
     update_key = []
-
+    if db_news.count() == 0 and not trace:
+        return
     for doc in db_news:
         update_key.append(doc['key'])
         content += (u"<li>[%s]<a href=\"%s\">%s</a>(%s)</li>" % (doc['regional'], doc['url'], doc['title'], doc['date']))
