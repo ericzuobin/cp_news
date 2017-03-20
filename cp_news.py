@@ -48,11 +48,10 @@ def log_record(base_name, func):
 
 
 # 中彩网
-def zhcw_zygg_parser():
+def zhcw_parser(url, fun):
     try:
         base_name = u'中彩网'
         base_url = 'http://www.zhcw.com'
-        url = 'http://www.zhcw.com/xinwen/zhongyaogonggao/'
         ul_reg = u'<ul class="Nlistul">[\s\S]*?<\/ul>'
         li_reg = u'<li><span class="Nlink">.*?href="(.*?)".*?>(.*?)<\/a>[\s\S]*?Ntime">(.*?)</span><\/li>'
         content = url_get(url)
@@ -66,7 +65,17 @@ def zhcw_zygg_parser():
         filter_news(pre_map, base_name)
         news_save(pre_map)
     except :
-        log_record(base_name=base_name, func=zhcw_zygg_parser)
+        log_record(base_name=base_name, func=fun)
+
+
+def zhcw_zygg_parser():
+    url = 'http://www.zhcw.com/xinwen/zhongyaogonggao/'
+    zhcw_parser(url, zhcw_zygg_parser)
+
+
+def zhcw_dsfc_parser():
+    url = 'http://www.zhcw.com/xinwen/dishifengcai/'
+    zhcw_parser(url, zhcw_dsfc_parser)
 
 
 # 中福在线
@@ -326,6 +335,7 @@ def send_mail():
 
 def parser():
     zhcw_zygg_parser()
+    zhcw_dsfc_parser()
     zhtc_zzgg_parser()
     sdtc_tcgz_parser()
     gdlottery_gg_parser()
