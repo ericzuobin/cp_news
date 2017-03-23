@@ -139,11 +139,10 @@ def cwl_fcyw_parser():
 
 
 # 中国体彩网
-def zhtc_zzgg_parser():
+def zhtc_parser(url, fun):
     try:
         base_name = u'中国体彩'
         base_url = 'http://www.lottery.gov.cn'
-        url = 'http://www.lottery.gov.cn/tzgg/index.html'
         ul_reg = u'<div class="main_l">[\s\S]*?<\/div>'
         li_reg = u'<li><span>\((.*?)\)<\/span><a.*?<\/a><a.*?href="(.*?)">(.*?)<\/a><\/li>'
         content = url_get(url)
@@ -157,7 +156,46 @@ def zhtc_zzgg_parser():
         filter_news(pre_map, base_name)
         news_save(pre_map)
     except :
-        log_record(base_name=base_name, func=zhtc_zzgg_parser)
+        log_record(base_name=base_name, func=fun)
+
+
+# 中国体彩网
+def zhtc_zzgg_parser():
+    url = 'http://www.lottery.gov.cn/tzgg/index.html'
+    zhtc_parser(url, zhtc_zzgg_parser)
+
+
+# 中国体彩网
+def zhtc_gp_parser(url, fun):
+    try:
+        base_name = u'中国体彩'
+        base_url = 'http://www.lottery.gov.cn'
+        ul_reg = u'<div class="main_l">[\s\S]*?<\/div>'
+        li_reg = u'<h4><a.*?href="(.*?)".*?>(.*?)<\/a><\/h4>\s*<p>[\s\S]*?<\/p>\s*<span>\((.*?)\)<\/span>'
+        content = url_get(url)
+        ul_group = re.findall(ul_reg, content, re.S | re.M)
+        li_group = re.findall(li_reg, ul_group[0], re.S | re.M)
+        if not li_group:
+            trace.append(url + ":不匹配")
+        pre_map = {}
+        for li_line in li_group:
+            pre_save(pre_map, unicode(base_url + li_line[0], 'utf-8'), unicode(li_line[1], 'utf-8'), unicode(li_line[2], 'utf-8'), base_name)
+        filter_news(pre_map, base_name)
+        news_save(pre_map)
+    except :
+        log_record(base_name=base_name, func=fun)
+
+
+# 中国体彩网
+def zhtc_gpdfdt_parser():
+    url = 'http://www.lottery.gov.cn/gpgddt/index.html'
+    zhtc_gp_parser(url, zhtc_gpdfdt_parser)
+
+
+# 中国体彩网
+def zhtc_gpgg_parser():
+    url = 'http://www.lottery.gov.cn/gptzgg/index.html'
+    zhtc_gp_parser(url, zhtc_gpgg_parser)
 
 
 # 山东体彩网
@@ -339,8 +377,10 @@ def parser():
     zhtc_zzgg_parser()
     sdtc_tcgz_parser()
     gdlottery_gg_parser()
+    zhtc_gpgg_parser()
     gdlottery_xw_parser()
     gxlottery_parser()
+    zhtc_gpdfdt_parser()
     cwl_parser()
     cwl_scdt_parser()
     cwl_fcyw_parser()
